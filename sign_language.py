@@ -1,5 +1,7 @@
 import Leap
 from frame_handler import Handler
+import time
+
 
 class SampleListener(Leap.Listener):
 
@@ -9,7 +11,9 @@ class SampleListener(Leap.Listener):
     def on_frame(self, controller):
         # Get the most recent frame and report some basic information
         frame = controller.frame()
-        self.handler.handle(frame)
+        sol = self.handler.handle(frame)
+        if sol:
+            print(sol)
 
 
 def main():

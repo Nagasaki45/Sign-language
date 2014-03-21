@@ -18,12 +18,11 @@ class Handler:
                             gesture_circles=0,
                             gesture_swipes=0,
                             gesture_key_taps=0,
-                            gesture_screen_taps=0)
+                            gesture_screen_taps=0,
+                            circle_direction=0)
         self.no_gesture_counter = 0
 
     def handle(self, frame):
-
-        # print(frame.hands[0].palm_position)
 
         if frame.gestures():
             self.back_stack.append(frame)
@@ -37,16 +36,19 @@ class Handler:
             for gesture in frame.gestures():
                 if gesture.type == Leap.Gesture.TYPE_CIRCLE:
                     self.counter['gesture_circles'] += 1
-                    return None
-                if gesture.type == Leap.Gesture.TYPE_SWIPE:
+                    c = Leap.CircleGesture(gesture)
+                    if (c.pointable.direction.angle_to(c.normal) <=
+                            Leap.PI / 2):
+                        self.counter['circle_direction'] += 1
+                    else:
+                        self.counter['circle_direction'] -= 1
+                elif gesture.type == Leap.Gesture.TYPE_SWIPE:
                     self.counter['gesture_swipes'] += 1
-                    return None
-                if gesture.type == Leap.Gesture.TYPE_KEY_TAP:
+                elif gesture.type == Leap.Gesture.TYPE_KEY_TAP:
                     self.counter['gesture_key_taps'] += 1
-                    return None
-                if gesture.type == Leap.Gesture.TYPE_SCREEN_TAP:
+                elif gesture.type == Leap.Gesture.TYPE_SCREEN_TAP:
                     self.counter['gesture_screen_taps'] += 1
-                    return None
+            return None
 
         if not frame.gestures() and self.back_stack:
 
@@ -61,10 +63,8 @@ class Handler:
             if not len(self.back_stack) >= self.BACK_STACK_MAX_LEN:
                 self.init_data_structures()
                 if gesture == 'gesture_key_taps':
-                    print('TAP')
                     return 'TAP'
                 if gesture == 'gesture_screen_taps':
-                    print('SCREEN TAP')
                     return 'SCREEN_TAP'
                 else:
                     print('back_stack too short and not a tap', gesture)
@@ -85,20 +85,28 @@ class Handler:
                           self.back_stack[(self.BACK_STACK_MAX_LEN / 2):]]}
                    }
 
-            for name in ['start', 'stop']:
-                vec_len = len(vec[name]['l'])
-                vec[name]['x'] = sum([x[0] for x in vec[name]['l']]) / vec_len
-                vec[name]['y'] = sum([x[1] for x in vec[name]['l']]) / vec_len
-                vec[name]['z'] = sum([x[2] for x in vec[name]['l']]) / vec_len
+            if gesture == 'gesture_circles':
+                l = ['clockwise', 'counterclockwise']
+                direction = l[0] if \
+                    self.counter['circle_direction'] >= 0 else l[1]
 
-            diff = {axis: (vec['stop'][axis] - vec['start'][axis])
-                    for axis in ['x', 'y', 'z']}
-            max_diff = max(diff, key=lambda x: abs(diff[x]))
-            diff_direction = ('+' if diff[max_diff] > 0 else '-') + max_diff
+            else:
+                for name in ['start', 'stop']:
+                    vec_len = len(vec[name]['l'])
+                    vec[name]['x'] = sum([x[0]
+                                         for x in vec[name]['l']]) / vec_len
+                    vec[name]['y'] = sum([x[1]
+                                         for x in vec[name]['l']]) / vec_len
+                    vec[name]['z'] = sum([x[2]
+                                         for x in vec[name]['l']]) / vec_len
+
+                diff = {axis: (vec['stop'][axis] - vec['start'][axis])
+                        for axis in ['x', 'y', 'z']}
+                max_diff = max(diff, key=lambda x: abs(diff[x]))
+                direction = ('+' if diff[max_diff] > 0 else '-') + max_diff
 
             # return solution
-            sol = (hands, fingers_a, fingers_b, gesture, diff_direction)
-            print(sol)
+            sol = (hands, fingers_a, fingers_b, gesture, direction)
 
             # empty back_stack and counter
             self.init_data_structures()
