@@ -1,131 +1,105 @@
 import Leap
 
-# DON'T USE THIS HANDLER
-def old_handle(frame_data):
 
-    def state_string(state):
-        if state == Leap.Gesture.STATE_START:
-            return "STATE_START"
+class Handler:
 
-        if state == Leap.Gesture.STATE_UPDATE:
-            return "STATE_UPDATE"
+    BACK_STACK_MAX_LEN = 30
+    NO_GESTURE_COUNTER_MAX_LEN = 2
 
-        if state == Leap.Gesture.STATE_STOP:
-            return "STATE_STOP"
+    def __init__(self):
+        self.init_data_structures()
 
-        if state == Leap.Gesture.STATE_INVALID:
-            return "STATE_INVALID"
+    def init_data_structures(self):
+        self.back_stack = []
+        self.counter = dict(frames=0,
+                            hands=0,
+                            fingers_a=0,
+                            fingers_b=0,
+                            gesture_circles=0,
+                            gesture_swipes=0,
+                            gesture_key_taps=0,
+                            gesture_screen_taps=0)
+        self.no_gesture_counter = 0
 
-    print "Frame id: %d, timestamp: %d, hands: %d, fingers: %d, tools: %d, gestures: %d" % (
-              frame.id, frame.timestamp, len(frame.hands), len(frame.fingers), len(frame.tools), len(frame.gestures()))
+    def handle(self, frame):
 
-    if not frame.hands.is_empty:
-        # Get the first hand
-        hand = frame.hands[0]
+        # print(frame.hands[0].palm_position)
 
-        # Check if the hand has any fingers
-        fingers = hand.fingers
-        if not fingers.is_empty:
-            # Calculate the hand's average finger tip position
-            avg_pos = Leap.Vector()
-            for finger in fingers:
-                avg_pos += finger.tip_position
-            avg_pos /= len(fingers)
-            print "Hand has %d fingers, average finger tip position: %s" % (
-                  len(fingers), avg_pos)
+        if frame.gestures():
+            self.back_stack.append(frame)
+            if len(self.back_stack) > self.BACK_STACK_MAX_LEN:
+                self.back_stack.pop(self.BACK_STACK_MAX_LEN / 2)
+            # add stuff to counter
+            self.counter['frames'] += 1
+            self.counter['hands'] += len(frame.hands)
+            self.counter['fingers_a'] += len(frame.hands[0].fingers)
+            self.counter['fingers_b'] += len(frame.hands[1].fingers)
+            for gesture in frame.gestures():
+                if gesture.type == Leap.Gesture.TYPE_CIRCLE:
+                    self.counter['gesture_circles'] += 1
+                    return None
+                if gesture.type == Leap.Gesture.TYPE_SWIPE:
+                    self.counter['gesture_swipes'] += 1
+                    return None
+                if gesture.type == Leap.Gesture.TYPE_KEY_TAP:
+                    self.counter['gesture_key_taps'] += 1
+                    return None
+                if gesture.type == Leap.Gesture.TYPE_SCREEN_TAP:
+                    self.counter['gesture_screen_taps'] += 1
+                    return None
 
-        # Get the hand's sphere radius and palm position
-        print "Hand sphere radius: %f mm, palm position: %s" % (
-              hand.sphere_radius, hand.palm_position)
+        if not frame.gestures() and self.back_stack:
 
-        # Get the hand's normal vector and direction
-        normal = hand.palm_normal
-        direction = hand.direction
+            if self.no_gesture_counter < self.NO_GESTURE_COUNTER_MAX_LEN:
+                self.no_gesture_counter += 1
+                return None
 
-        # Calculate the hand's pitch, roll, and yaw angles
-        print "Hand pitch: %f degrees, roll: %f degrees, yaw: %f degrees" % (
-            direction.pitch * Leap.RAD_TO_DEG,
-            normal.roll * Leap.RAD_TO_DEG,
-            direction.yaw * Leap.RAD_TO_DEG)
+            gestures = {key: value for key, value in self.counter.items()
+                        if key.startswith('gesture')}
+            gesture = max(gestures, key=lambda x: gestures[x])
 
-        # Gestures
-        for gesture in frame.gestures():
-            if gesture.type == Leap.Gesture.TYPE_CIRCLE:
-                circle = Leap.CircleGesture(gesture)
-
-                # Determine clock direction using the angle between the pointable and the circle normal
-                if circle.pointable.direction.angle_to(circle.normal) <= Leap.PI/4:
-                    clockwiseness = "clockwise"
+            if not len(self.back_stack) >= self.BACK_STACK_MAX_LEN:
+                self.init_data_structures()
+                if gesture == 'gesture_key_taps':
+                    print('TAP')
+                    return 'TAP'
+                if gesture == 'gesture_screen_taps':
+                    print('SCREEN TAP')
+                    return 'SCREEN_TAP'
                 else:
-                    clockwiseness = "counterclockwise"
+                    print('back_stack too short and not a tap', gesture)
+                    return None
 
-                # Calculate the angle swept since the last frame
-                swept_angle = 0
-                if circle.state != Leap.Gesture.STATE_START:
-                    previous_update = CircleGesture(controller.frame(1).gesture(circle.id))
-                    swept_angle =  (circle.progress - previous_update.progress) * 2 * Leap.PI
+            # calculate back_stack and counter means
+            frames = self.counter['frames']
+            hands = round(float(self.counter['hands']) / frames)
+            fingers_a = round(float(self.counter['fingers_a']) / frames)
+            fingers_b = round(float(self.counter['fingers_b']) / frames)
 
-                print "Circle id: %d, %s, progress: %f, radius: %f, angle: %f degrees, %s" % (
-                        gesture.id, state_string(gesture.state),
-                        circle.progress, circle.radius, swept_angle * Leap.RAD_TO_DEG, clockwiseness)
+            vec = {'start':
+                   {'l': [x.hands[0].palm_position for x in
+                          self.back_stack[:(self.BACK_STACK_MAX_LEN / 2)]]},
 
-            if gesture.type == Leap.Gesture.TYPE_SWIPE:
-                swipe = Leap.SwipeGesture(gesture)
-                print "Swipe id: %d, state: %s, position: %s, direction: %s, speed: %f" % (
-                        gesture.id, state_string(gesture.state),
-                        swipe.position, swipe.direction, swipe.speed)
+                   'stop':
+                   {'l': [x.hands[0].palm_position for x in
+                          self.back_stack[(self.BACK_STACK_MAX_LEN / 2):]]}
+                   }
 
-            if gesture.type == Leap.Gesture.TYPE_KEY_TAP:
-                keytap = Leap.KeyTapGesture(gesture)
-                print "Key Tap id: %d, %s, position: %s, direction: %s" % (
-                        gesture.id, state_string(gesture.state),
-                        keytap.position, keytap.direction )
+            for name in ['start', 'stop']:
+                vec_len = len(vec[name]['l'])
+                vec[name]['x'] = sum([x[0] for x in vec[name]['l']]) / vec_len
+                vec[name]['y'] = sum([x[1] for x in vec[name]['l']]) / vec_len
+                vec[name]['z'] = sum([x[2] for x in vec[name]['l']]) / vec_len
 
-            if gesture.type == Leap.Gesture.TYPE_SCREEN_TAP:
-                screentap = Leap.ScreenTapGesture(gesture)
-                print "Screen Tap id: %d, %s, position: %s, direction: %s" % (
-                        gesture.id, state_string(gesture.state),
-                        screentap.position, screentap.direction )
+            diff = {axis: (vec['stop'][axis] - vec['start'][axis])
+                    for axis in ['x', 'y', 'z']}
+            max_diff = max(diff, key=lambda x: abs(diff[x]))
+            diff_direction = ('+' if diff[max_diff] > 0 else '-') + max_diff
 
-    if not (frame.hands.is_empty and frame.gestures().is_empty):
-        print ""
+            # return solution
+            sol = (hands, fingers_a, fingers_b, gesture, diff_direction)
+            print(sol)
 
-
-BACK_STACK_MAX_LEN = 50
-back_stack = []
-counter = dict(frames=0,
-               hands=0,
-               fingers_l=0,
-               fingers_r=0)
-
-
-def handle(frame):
-
-    if frame.gestures():
-        back_stack.append(frame)
-        if len(back_stack) >= 2 * BACK_STACK_MAX_LEN:
-            back_stack.pop(BACK_STACK_MAX_LEN)
-        # add stuff to counter
-
-
-
-    elif not frame.gestures() and back_stack:
-        # calculate back_stack and counter means
-        frames = counter['frames'] or 1
-        hands = round(float(counter['hands']) / frames)
-        fingers_l = round(float(counter['fingers_l']) / frames)
-        fingers_r = round(float(counter['fingers_r']) / frames)
-        gestures = {key: value for key, value in counter.items()
-            if key.startswith('gesture')}
-        print(gestures)
-
-        # empty back_stack and counter
-        back_stack = []
-        counter = {}
-
-        # TODO remove this
-        gesture = "SWIPE"
-        direction = "UP"
-
-        # return solution
-        return (hands, fingers_l, fingers_r, gesture, direction)
+            # empty back_stack and counter
+            self.init_data_structures()
+            return sol
