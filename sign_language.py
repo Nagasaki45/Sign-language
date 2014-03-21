@@ -6,7 +6,7 @@ class SampleListener(Leap.Listener):
     def on_frame(self, controller):
         # Get the most recent frame and report some basic information
         frame = controller.frame()
-        frame_handler.handle(frame, None)
+        frame_handler.handle(frame)
 
 
 def main():

@@ -1,6 +1,7 @@
 import Leap
 
-def handle(frame_data, callback):
+# DON'T USE THIS HANDLER
+def old_handle(frame_data):
 
     def state_string(state):
         if state == Leap.Gesture.STATE_START:
@@ -88,3 +89,43 @@ def handle(frame_data, callback):
 
     if not (frame.hands.is_empty and frame.gestures().is_empty):
         print ""
+
+
+BACK_STACK_MAX_LEN = 50
+back_stack = []
+counter = dict(frames=0,
+               hands=0,
+               fingers_l=0,
+               fingers_r=0)
+
+
+def handle(frame):
+
+    if frame.gestures():
+        back_stack.append(frame)
+        if len(back_stack) >= 2 * BACK_STACK_MAX_LEN:
+            back_stack.pop(BACK_STACK_MAX_LEN)
+        # add stuff to counter
+
+
+
+    elif not frame.gestures() and back_stack:
+        # calculate back_stack and counter means
+        frames = counter['frames'] or 1
+        hands = round(float(counter['hands']) / frames)
+        fingers_l = round(float(counter['fingers_l']) / frames)
+        fingers_r = round(float(counter['fingers_r']) / frames)
+        gestures = {key: value for key, value in counter.items()
+            if key.startswith('gesture')}
+        print(gestures)
+
+        # empty back_stack and counter
+        back_stack = []
+        counter = {}
+
+        # TODO remove this
+        gesture = "SWIPE"
+        direction = "UP"
+
+        # return solution
+        return (hands, fingers_l, fingers_r, gesture, direction)
