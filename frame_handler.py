@@ -3,7 +3,7 @@ import Leap
 
 class Handler:
 
-    BACK_STACK_MAX_LEN = 30
+    BACK_STACK_MAX_LEN = 16
     NO_GESTURE_COUNTER_MAX_LEN = 2
 
     def __init__(self):
