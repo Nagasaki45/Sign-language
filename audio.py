@@ -18,7 +18,7 @@ def play_sound(name):
     from subprocess import call
     # for linux: mpg123
     # for mac: afplay
-    call(['mpg123', audio_dir + item +'.mp3'])
+    call(['mpg123', audio_dir + name +'.mp3'])
  
 if __name__ == "__main__":
     for item in ['hello',
