@@ -1,3 +1,4 @@
 Sample.py
 *.pyc
 *.mp3
+!audio/beep.mp3

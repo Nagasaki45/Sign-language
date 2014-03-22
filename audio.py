@@ -18,10 +18,11 @@ def get_mp3_file(address, item):
  
 def play_sound(name):
     from subprocess import call
-    # for linux: mpg123
     # for mac: afplay
-    # for windows: vlc --play-and-exit
-    call(['mpg123',  os.path.join(AUDIO_DIR, name + ".mp3")])
+    # windows:
+    # call(['vlc', '--play-and-exit', os.path.join(AUDIO_DIR, name + ".mp3")])
+    # linux:
+    call(['mpg123', os.path.join(AUDIO_DIR, name + ".mp3")])
     
 def text2speech(item):
     if not item + '.mp3' in os.listdir(AUDIO_DIR):
