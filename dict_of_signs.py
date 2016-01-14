@@ -67,20 +67,3 @@ DICT = {
     'TAP': 'I',
     'SCREEN_TAP': 'you'
 }
-
-OLD_DICT = {'+x110.0': 'hello',
-            '+x120.0': 'hello',
-            '+y120.0': 'How are you feeling',
-            'CR2': 'Tired',
-            "+x140.0": 'Was it Hard',
-            "+x130.0": 'Was it Hard',
-            '+y110.0': 'beep',
-            'CL1': 'We should do it again',
-            '-y110.0': 'OK',
-            '-x110.0': 'Have a great week',
-            '-x120.0': 'Have a great week',
-            '-x130.0': 'Have a great week',
-            'TAP': 'I',
-            'SCREEN_TAP': 'you',
-            'CR1': 'thank you'
-            }

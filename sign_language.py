@@ -3,10 +3,6 @@ from frame_handler import Handler
 from dict_of_signs import DICT
 import audio
 
-# TODO remove this
-import sys
-sys.path.append("C:\Users\Mel\Desktop\Leap")
-
 
 class SampleListener(Leap.Listener):
 
@@ -17,13 +13,11 @@ class SampleListener(Leap.Listener):
         # Get the most recent frame and report some basic information
         frame = controller.frame()
         sol = self.handler.handle(frame)
-        if sol: 
-            print sol
-            sentence = DICT.get(sol, None)
-            if sentence:
-                print sentence
-                audio.text2speech(sentence)
-        
+        try:
+            audio.say(DICT[sol])
+        except KeyError:
+            pass
+
 
 def main():
     # Create a sample listener and controller

@@ -1,32 +1,36 @@
-import urllib2
+import subprocess
+import requests
 import os
 
-AUDIO_DIR = 'audio'
-URL = 'http://translate.google.com/translate_tts?tl=en&q='
+KEY = os.environ['VOICE_RSS_KEY']
 
- 
-def word_to_url(word):
-    return URL + urllib2.quote(word.encode('utf8'))
- 
-def get_mp3_file(address, item):
-    url = address
-    request = urllib2.Request(url)
-    request.add_header('User-agent', 'Mozilla/5.0')
-    opener = urllib2.build_opener()
-    with open(os.path.join(AUDIO_DIR, item + ".mp3"), "wb") as f:
-        f.write(opener.open(request).read())
- 
-def play_sound(name):
-    from subprocess import call
-    # for mac: afplay
-    # windows:
-    # call(['vlc', '--play-and-exit', os.path.join(AUDIO_DIR, name + ".mp3")])
-    # linux:
-    call(['mpg123', os.path.join(AUDIO_DIR, name + ".mp3")])
-    
-def text2speech(item):
-    if not item + '.mp3' in os.listdir(AUDIO_DIR):
-        print 'downloading'
-        get_mp3_file(word_to_url(item), item)
-        
-    play_sound(item)
+
+def play(filepath):
+    """Play an audio file."""
+    call(['mpg123', filepath])
+
+
+def call(args):
+    """Call another process, don't show it's output."""
+    p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    return p.communicate()
+
+
+def get_audio_file(text):
+    """Download a text to speech file from Voice RSS."""
+    query_params = {'key': KEY, 'src': text}
+    response = requests.get('http://api.voicerss.org/', params=query_params)
+    with open(text_filepath(text), "wb") as f:
+        f.write(response.content)
+
+
+def text_filepath(text):
+    return os.path.join('audio', text + '.mp3')
+
+
+def say(text):
+    """Say the provided text using text to speech."""
+    filepath = text_filepath(text)
+    if not os.path.exists(filepath):
+        get_audio_file(text)
+    play(filepath)
