@@ -1,4 +1,4 @@
-import Leap
+from leap_python3 import Leap
 from frame_handler import Handler
 from dict_of_signs import DICT
 import audio
@@ -34,8 +34,7 @@ def main():
     controller.add_listener(listener)
 
     # Keep this process running until Enter is pressed
-    print "Press Enter to quit..."
-    ans = raw_input()
+    ans = input("Press Enter to quit...\n")
 
     # Remove the sample listener when done
     controller.remove_listener(listener)

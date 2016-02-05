@@ -1,4 +1,4 @@
-import Leap
+from leap_python3 import Leap
 
 
 class Handler:
@@ -27,7 +27,7 @@ class Handler:
         if frame.gestures():
             self.back_stack.append(frame)
             if len(self.back_stack) > self.BACK_STACK_MAX_LEN:
-                self.back_stack.pop(self.BACK_STACK_MAX_LEN / 2)
+                self.back_stack.pop(self.BACK_STACK_MAX_LEN // 2)
             # add stuff to counter
             self.counter['frames'] += 1
             self.counter['hands'] += len(frame.hands)
@@ -78,11 +78,11 @@ class Handler:
 
             vec = {'start':
                    {'l': [x.hands[0].palm_position for x in
-                          self.back_stack[:(self.BACK_STACK_MAX_LEN / 2)]]},
+                          self.back_stack[:(self.BACK_STACK_MAX_LEN // 2)]]},
 
                    'stop':
                    {'l': [x.hands[0].palm_position for x in
-                          self.back_stack[(self.BACK_STACK_MAX_LEN / 2):]]}
+                          self.back_stack[(self.BACK_STACK_MAX_LEN // 2):]]}
                    }
 
             if gesture == 'gesture_circles':
