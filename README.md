@@ -14,7 +14,7 @@ Create a conda virtual environment:
 
 You will also need a [voice rss](TODO link) key, to convert text to speech. Get one and run:
 
-    export VOICE_RSS_KEY=f6a018e61f054a649596fc721e04a2e4
+    export VOICE_RSS_KEY=<YOUR KEY>
 
 If you are using [autoenv](https://github.com/horosgrisa/autoenv) you can write the above line to a `secrets` file and it will be sourced when you change into the project directory.
 
