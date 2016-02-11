@@ -1,43 +1,46 @@
+import threading
+import time
+
 from leap_python3 import Leap
-from frame_handler import Handler
-from dict_of_signs import DICT
-import audio
+from pythonosc.udp_client import UDPClient
+from pythonosc.dispatcher import Dispatcher
+from pythonosc.osc_server import ThreadingOSCUDPServer
+
+import leap_utils
+import osc_utils
+import audio_utils
 
 
-class SampleListener(Leap.Listener):
-
+class LeapListener(Leap.Listener):
     def on_init(self, controller):
-        self.handler = Handler()
+        self.osc_client = UDPClient('127.0.0.1', 6448)
 
     def on_frame(self, controller):
-        # Get the most recent frame and report some basic information
         frame = controller.frame()
-        sol = self.handler.handle(frame)
-        try:
-            audio.say(DICT[sol])
-        except KeyError:
-            pass
+        positioning_values = leap_utils.get_raw_tip_positioning_data(frame)
+        msg = osc_utils.build_osc_message(positioning_values)
+        self.osc_client.send(msg)
+        time.sleep(0.05)
+
+
+def say_handler(*args):
+    if len(args) > 1:
+        return
+    msg = args[0]
+    text = msg.lstrip('/').replace('_', ' ')
+    audio_utils.say(text)
 
 
 def main():
-    # Create a sample listener and controller
     controller = Leap.Controller()
-    listener = SampleListener()
-
-    # Enable gestures
-    controller.enable_gesture(Leap.Gesture.TYPE_CIRCLE);
-    controller.enable_gesture(Leap.Gesture.TYPE_KEY_TAP);
-    controller.enable_gesture(Leap.Gesture.TYPE_SCREEN_TAP);
-    controller.enable_gesture(Leap.Gesture.TYPE_SWIPE);
-
-    # Have the sample listener receive events from the controller
+    listener = LeapListener()
     controller.add_listener(listener)
 
-    # Keep this process running until Enter is pressed
-    ans = input("Press Enter to quit...\n")
-
-    # Remove the sample listener when done
-    controller.remove_listener(listener)
+    dispatcher = Dispatcher()
+    dispatcher.map("/*", say_handler)
+    osc_server = ThreadingOSCUDPServer(('127.0.0.1', 12000), dispatcher)
+    threading.Thread(target=osc_server.serve_forever, daemon=True).start()
+    input('Press any key to quit...\n')
 
 
 if __name__ == "__main__":
