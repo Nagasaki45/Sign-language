@@ -2,7 +2,7 @@
 
 A sign-language to speech application that uses the LeapMotion to track gestures, map the gestures into (currently) predefined sentences and say them.
 
-The project was originally created in the TODO hackathon, together with TODO and TODO.
+The project was originally created in the Hack2Wear hackathon (2014), together with Ilai Giloh and Mel.
 
 ## How to run it?
 I use [leap_python3](https://github.com/Nagasaki45/leap_python3) as a git submodule, so make sure to pull the submodule and compile it (see instruction in the link) before running.
@@ -12,7 +12,7 @@ Create a conda virtual environment:
     conda env create -f environment.yml
     conda activate Sign-language
 
-You will also need a [voice rss](TODO link) key, to convert text to speech. Get one and run:
+You will also need a [voice rss](http://voicerss.org/) key, to convert text to speech. Get one and run:
 
     export VOICE_RSS_KEY=<YOUR KEY>
 
