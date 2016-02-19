@@ -10,10 +10,10 @@ The project was originally created in the Hack2Wear hackathon (2014), together w
 
 First, you will have to install the [WekiMini](http://wekinator.org/). In addition, I use [leap_python3](https://github.com/Nagasaki45/leap_python3) as a git submodule, so make sure to pull the submodule and compile it (see instruction in the link) before running.
 
-Create a conda virtual environment:
+Create virtual environment:
 
-    conda env create -f environment.yml
-    conda activate Sign-language
+    virtualenv env
+    source env/bin/activate
 
 You will also need a [voice rss](http://voicerss.org/) key, to convert text to speech. Get one and run:
 

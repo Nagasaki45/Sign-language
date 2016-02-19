@@ -1,0 +1,2 @@
+python-osc==1.5
+requests==2.9.1

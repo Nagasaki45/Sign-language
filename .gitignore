@@ -1,4 +1,4 @@
-*.pyc
+__pycache__
 *.mp3
-!audio/beep.mp3
 secrets
+env
