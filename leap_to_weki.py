@@ -23,8 +23,11 @@ def main():
     controller = Leap.Controller()
     listener = LeapListener()
     controller.add_listener(listener)
-    while True:
-        time.sleep(1)
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        pass
 
 
 if __name__ == "__main__":
