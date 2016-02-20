@@ -6,19 +6,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Sign-language</title>
   <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
 
   <div class="container">
-    <div>
-      <h1>Sign-language</h1>
-      <p class="lead">A gesture to speech application that uses the LeapMotion to track gestures and the WekiMini to map gestures to sentences.</p>
-    </div>
+    <h1>Sign-language</h1>
+    <p class="lead">A gesture to speech application that uses the LeapMotion to track gestures and the WekiMini to map gestures to sentences.</p>
+
+    <div id="app">
+      <ul class="list-group">
+
+        <li class="list-group-item focused">
+          <p class="lead">{{ focused.text }}</p>
+          <div v-on:click="record" class="btn {{ record_btn_properties.cls }}">
+            {{ record_btn_properties.text }}
+          </div>
+        </li>
+
+        <li v-for="sentence in sentences" class="list-group-item out-of-focus">
+          {{ sentence.text }}
+          <p v-on:click="focus(sentence)"
+             class="btn btn-default btn-xs pull-right">
+            edit
+          </p>
+        </li>
+      </ul>
+    </div><!-- /#app -->
+
   </div><!-- /.container -->
 
   <script src="/static/js/jquery-2.1.1.min.js"></script>
+  <script src="/static/js/lodash.min.js"></script>
   <script src="/static/js/vue.min.js"></script>
   <script src="/static/js/bootstrap.min.js"></script>
+
+  <script src="/static/js/app.js"></script>
 
 </body>
 </html>

@@ -1,0 +1,9 @@
+.focused {
+  border-width: 8px;
+  border-radius: 4px;
+}
+
+.out-of-focus {
+  margin-left: 30px;
+  margin-right: 30px;
+}
