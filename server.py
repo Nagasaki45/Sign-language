@@ -1,8 +1,7 @@
 import re
 import asyncio
-import json
 
-from aiohttp import web, MsgType
+from aiohttp import web
 from pythonosc.dispatcher import Dispatcher
 from pythonosc.osc_server import AsyncIOOSCUDPServer
 
@@ -13,7 +12,7 @@ with open('index.html') as f:
     index_html = f.read().encode('ascii')
 
 sentences = {
-    1: 'hello',
+    1: 'Hello',
     2: 'My name is Tom',
     3: 'What is your name?',
 }
@@ -33,33 +32,31 @@ def init_osc(loop):
 
 async def init_web(loop):
     app = web.Application()
-    websocket_handler = WebSocketHandler()
     app.router.add_route('GET', '/', index)
-    app.router.add_route('GET', '/ws', websocket_handler.handle)
+    app.router.add_route('GET', '/ajax/sentences', get_sentences)
+    app.router.add_route('GET', '/ajax/record', record)
+    app.router.add_route('GET', '/ajax/delete', delete)
     app.router.add_static('/static', 'static')
-    await loop.create_server(app.make_handler(), '0.0.0.0', 8080)
+    await loop.create_server(app.make_handler(), '127.0.0.1', 8080)
 
 
 async def index(request):
     return web.Response(body=index_html)
 
 
-class WebSocketHandler:
-    async def handle(self, request):
-        ws = web.WebSocketResponse()
-        await ws.prepare(request)
+async def get_sentences(request):
+    js_sentences = [{'id': k, 'text': v} for k, v in sentences.items()]
+    return web.json_response(js_sentences)
 
-        async for msg in ws:
-            if msg.tp == MsgType.text:
-                msg_dict = json.loads(msg.data)
-                msg_type = msg_dict.pop('type')
-                handler = getattr(self, 'handle_' + msg_type)
-                await handler(ws, msg_dict)
 
-    async def handle_get_sentences(self, ws, msg_dict):
-        js_sentences = [{'id': k, 'text': v} for k, v in sentences.items()]
-        response = {'type': 'sentences', 'content': js_sentences}
-        ws.send_str(json.dumps(response))
+async def record(request):
+    print('record', request.GET)
+    return web.json_response({})
+
+
+async def delete(request):
+    print('delete', request.GET)
+    return web.json_response({})
 
 
 def main():

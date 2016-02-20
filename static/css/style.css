@@ -1,6 +1,7 @@
 .focused {
   border-width: 8px;
   border-radius: 4px;
+  background-color: lightblue;
 }
 
 .out-of-focus {
