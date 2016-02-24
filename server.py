@@ -34,7 +34,8 @@ async def init_web(loop):
     app = web.Application()
     app.router.add_route('GET', '/', index)
     app.router.add_route('GET', '/ajax/sentences', get_sentences)
-    app.router.add_route('GET', '/ajax/record', record)
+    app.router.add_route('GET', '/ajax/record_start', record_start)
+    app.router.add_route('GET', '/ajax/record_stop', record_stop)
     app.router.add_route('GET', '/ajax/delete', delete)
     app.router.add_static('/static', 'static')
     await loop.create_server(app.make_handler(), '127.0.0.1', 8080)
@@ -49,8 +50,13 @@ async def get_sentences(request):
     return web.json_response(js_sentences)
 
 
-async def record(request):
-    print('record', request.GET)
+async def record_start(request):
+    print('record_start', request.GET)
+    return web.json_response({})
+
+
+async def record_stop(request):
+    print('record_stop', request.GET)
     return web.json_response({})
 
 

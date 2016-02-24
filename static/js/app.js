@@ -1,35 +1,25 @@
 var vue = new Vue({
   el: '#app',
   data: {
-    recording: false,
-    focused: {text: ''},
+    focused: 0,
     sentences: []
   },
   methods: {
     focus: function (sentence) {
-      var index = this.sentences.indexOf(sentence);
-      this.sentences.splice(index, 1);
-      this.unfocus();
-      this.focused = sentence;
+      this.focused = this.sentences.indexOf(sentence);
     },
-    unfocus: function () {
-      if (this.focused.text != '') {
-        this.sentences.push(this.focused);
-      }
-      this.focused = {text: ''};
+    recordStart: function (sentence) {
+      sentence.recording = true;
+      $.ajax({url: '/ajax/record_start', data: sentence});
     },
-    record: function () {
-      var data = {sentence_id: vue.focused.id};
-      data.state = this.recording ? "stop" : "start"
-      $.ajax({url: '/ajax/record', data: data});
-      this.recording = !this.recording;
+    recordStop: function (sentence) {
+      sentence.recording = false;
+      $.ajax({url: '/ajax/record_stop', data: sentence});
     },
-    delete: function() {
-      if (this.focused.text != '') {
-        $.ajax({url: '/ajax/delete', data: {sentence_id: this.focused.id}});
-        this.focused = {text: ''}
-      }
-    },
+    delete: function (sentence) {
+      $.ajax({url: '/ajax/delete', data: sentence});
+      this.sentences.splice(this.focused, 1);
+    }
   }
 });
 
@@ -37,6 +27,9 @@ var vue = new Vue({
 $.ajax({
   url: '/ajax/sentences',
   success: function (data) {
+    for (sentence of data) {
+      sentence.recording = false;
+    }
     vue.sentences = data;
   }
 });

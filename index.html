@@ -16,30 +16,28 @@
 
     <div id="app">
       <ul class="list-group">
+        <template v-for="sentence in sentences">
+          <li v-if="$index == focused" class="list-group-item focused">
+            <p class="input-group">
+              <span class="input-group-addon">Sentence</span>
+              <input type="text" class="form-control lead" v-model="sentence.text">
+            </p>
+            <div class="btn-group btn-group-justified">
+              <template v-if="sentence.recording">
+                <a v-on:click="recordStop(sentence)" class="btn btn-danger">Stop recording</a>
+              </template>
+              <template v-else>
+                <a v-on:click="recordStart(sentence)" class="btn btn-success">Record gesture</a>
+                <a v-on:click="delete(sentence)" class="btn btn-warning">Delete sentence</a>
+              </template>
+            </div>
+          </li>
 
-        <li class="list-group-item focused">
-          <p class="input-group">
-            <span class="input-group-addon">Sentence</span>
-            <input type="text" class="form-control lead" v-model="focused.text">
-          </p>
-          <div class="btn-group btn-group-justified">
-            <template v-if="recording">
-              <a v-on:click="record" class="btn btn-danger">Stop recording</a>
-            </template>
-            <template v-else>
-              <a v-on:click="record" class="btn btn-success">Record gesture</a>
-              <a v-on:click="delete" class="btn btn-warning">Delete sentence</a>
-              <a v-on:click="unfocus" class="btn btn-default">Add sentence</a>
-            </template>
-          </div>
-        </li>
+          <li v-else v-on:click="focus(sentence)" class="list-group-item out-of-focus">
+            {{ sentence.text }}
+          </li>
 
-        <li v-for="sentence in sentences"
-            v-on:click="focus(sentence)"
-            class="list-group-item out-of-focus">
-          {{ sentence.text }}
-        </li>
-
+        </template>
       </ul>
     </div><!-- /#app -->
 
