@@ -27,7 +27,7 @@ Start the WekiMini. In the input section choose 30 inputs and in the output sect
 
 You will have to manually set the "Gesture OSC message" for each output to sentences, with leading `/` and underscores instead of spaces.
 
-Now run `./sign_language.sh`. It will start to pass data from the LeapMotion to the WekiMini and get data back to convert to audio and say them.
+Now run `./sign_language.py`. It will start to pass data from the LeapMotion to the WekiMini and get data back to convert to audio and say them.
 
 ## Future development
 
