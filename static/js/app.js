@@ -1,7 +1,7 @@
 var vue = new Vue({
   el: '#app',
   data: {
-    focused: 0,
+    focused: -1,
     sentences: []
   },
   methods: {
@@ -17,8 +17,9 @@ var vue = new Vue({
       $.ajax({url: '/ajax/record_stop', data: sentence});
     },
     delete: function (sentence) {
-      $.ajax({url: '/ajax/delete', data: sentence});
       this.sentences.splice(this.focused, 1);
+      this.focused = -1;
+      $.ajax({url: '/ajax/delete', data: sentence});
     }
   }
 });
