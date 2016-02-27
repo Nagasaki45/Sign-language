@@ -1,5 +1,6 @@
 import re
 import asyncio
+from itertools import count
 
 from aiohttp import web
 from pythonosc.dispatcher import Dispatcher
@@ -16,6 +17,13 @@ sentences = {
     2: 'My name is Tom',
     3: 'What is your name?',
 }
+
+
+def allocate_id(existing_ids):
+    """Find the smallest non reserved id."""
+    for i in count(start=1):
+        if not i in existing_ids:
+            return i
 
 
 def say_handler(msg):
@@ -37,6 +45,7 @@ async def init_web(loop):
     app.router.add_route('GET', '/ajax/record_start', record_start)
     app.router.add_route('GET', '/ajax/record_stop', record_stop)
     app.router.add_route('GET', '/ajax/delete', delete)
+    app.router.add_route('GET', '/ajax/add_new_sentence', add_new_sentence)
     app.router.add_static('/static', 'static')
     await loop.create_server(app.make_handler(), '127.0.0.1', 8080)
 
@@ -61,8 +70,15 @@ async def record_stop(request):
 
 
 async def delete(request):
-    print('delete', request.GET)
+    sentences.pop(int(request.GET['id']))
     return web.json_response({})
+
+
+async def add_new_sentence(request):
+    text = request.GET['text']
+    id_ = allocate_id(sentences.keys())
+    sentences[id_] = text
+    return web.json_response({'text': text, 'id': id_})
 
 
 def main():

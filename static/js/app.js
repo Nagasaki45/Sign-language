@@ -20,6 +20,19 @@ var vue = new Vue({
       this.sentences.splice(this.focused, 1);
       this.focused = -1;
       $.ajax({url: '/ajax/delete', data: sentence});
+    },
+    addNewSentence: function () {
+      var that = this,
+          textInput = $("#new-sentence-text");
+      $.ajax({
+        url: '/ajax/add_new_sentence',
+        data: {'text': textInput.val()},
+        success: function (sentence) {
+          sentence.recording = false;
+          that.sentences.push(sentence);
+          textInput.val('');
+        }
+      });
     }
   }
 });

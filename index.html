@@ -14,6 +14,12 @@
     <h1>Sign-language</h1>
     <p class="lead">A gesture to speech application that uses the LeapMotion to track gestures and the WekiMini to map gestures to sentences.</p>
 
+    <p class="text-center">
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#newSentenceModal">
+        Add a new sentence
+      </button>
+    <p>
+
     <div id="app">
       <ul class="list-group">
         <template v-for="sentence in sentences">
@@ -39,6 +45,25 @@
 
         </template>
       </ul>
+
+      <!-- New sentence modal -->
+      <div class="modal fade" id="newSentenceModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title">Add a new sentence</h4>
+            </div>
+            <div class="modal-body">
+              <input id="new-sentence-text" type="text" class="form-control">
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary" v-on:click="addNewSentence" data-dismiss="modal">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /#app -->
 
   </div><!-- /.container -->
