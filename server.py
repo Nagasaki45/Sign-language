@@ -5,6 +5,8 @@ from itertools import count
 from aiohttp import web
 from pythonosc.dispatcher import Dispatcher
 from pythonosc.osc_server import AsyncIOOSCUDPServer
+from pythonosc import udp_client
+from pythonosc.osc_message_builder import OscMessageBuilder
 
 import audio_utils
 
@@ -38,6 +40,14 @@ def init_osc(loop):
     osc_server.serve()  # Calls 'run_until_complete' internally
 
 
+def control_wekinator(endpoint, arg=None):
+    builder = OscMessageBuilder('/wekinator/control/{}'.format(endpoint))
+    if arg is not None:
+        builder.add_arg(arg)
+    msg = builder.build()
+    udp_client.UDPClient('127.0.0.1', 6448).send(msg)
+
+
 async def init_web(loop):
     app = web.Application()
     app.router.add_route('GET', '/', index)
@@ -60,12 +70,12 @@ async def get_sentences(request):
 
 
 async def record_start(request):
-    print('record_start', request.GET)
+    control_wekinator('startDtwRecording', int(request.GET['id']))
     return web.json_response({})
 
 
 async def record_stop(request):
-    print('record_stop', request.GET)
+    control_wekinator('stopDtwRecording', int(request.GET['id']))
     return web.json_response({})
 
 
