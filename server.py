@@ -71,6 +71,7 @@ async def get_sentences(request):
 
 async def record_start(request):
     control_wekinator('startDtwRecording', int(request.GET['id']))
+    control_wekinator('startRunning')
     return web.json_response({})
 
 
