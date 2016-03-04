@@ -1,6 +1,7 @@
 import re
 import asyncio
 from itertools import count
+import logging
 
 from aiohttp import web
 from pythonosc.dispatcher import Dispatcher
@@ -10,7 +11,11 @@ from pythonosc.osc_message_builder import OscMessageBuilder
 
 import audio_utils
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG if __debug__ else logging.WARNING)
+
 osc_msg_pattern = re.compile(r'^/output_(\d+)$')
+
 with open('index.html') as f:
     index_html = f.read().encode('ascii')
 
@@ -30,7 +35,10 @@ def allocate_id(existing_ids):
 
 def say_handler(msg):
     sentence_number = int(osc_msg_pattern.match(msg).groups()[0])
-    audio_utils.say(sentences[sentence_number])
+    try:
+        audio_utils.say(sentences[sentence_number])
+    except KeyError:
+        logger.warning('There is no sentence for gesture {}'.format(sentence_number))
 
 
 def init_osc(loop):
