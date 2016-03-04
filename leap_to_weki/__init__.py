@@ -1,10 +1,10 @@
 import time
 
-from leap_python3 import Leap
 from pythonosc.udp_client import UDPClient
 
-import leap_utils
-import osc_utils
+from .leap_python3 import Leap
+from . import leap_utils
+from . import osc_utils
 
 
 class LeapListener(Leap.Listener):

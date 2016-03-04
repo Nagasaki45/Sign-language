@@ -1,7 +1,7 @@
 import itertools
 
-from leap_python3.Leap import Finger, Hand
-import leap_hand_monkey_patch
+from .leap_python3.Leap import Finger, Hand
+from . import leap_hand_monkey_patch
 
 
 HAND_FINGERS = [Finger.TYPE_THUMB, Finger.TYPE_INDEX, Finger.TYPE_MIDDLE,
