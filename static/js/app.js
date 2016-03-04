@@ -23,7 +23,7 @@ var vue = new Vue({
     },
     addNewSentence: function () {
       var that = this,
-          textInput = $("#new-sentence-text");
+          textInput = $("#newSentenceText");
       $.ajax({
         url: '/ajax/add_new_sentence',
         data: {'text': textInput.val()},
@@ -47,3 +47,8 @@ $.ajax({
     vue.sentences = data;
   }
 });
+
+
+$('#newSentenceModal').on('shown.bs.modal', function () {
+    $('#newSentenceText').focus();
+})
