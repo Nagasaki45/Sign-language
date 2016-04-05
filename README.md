@@ -18,8 +18,8 @@ The project was originally created in the Hack2Wear hackathon (2014), together w
 
 1. Start the WekiMini. In the input section choose 30 inputs and in the output section choose the type: "All dynamic time warping" with `X` gesture types where `X` is the number of expected sentences you want to work with. Hit next.
 
-1. Run `./sign_language.py`. It will start to pass data from the LeapMotion to the WekiMini and get data back to convert to audio and say them.
+1. Run `./sign_language.py`. It will start to pass data from the LeapMotion to the WekiMini and get data back, convert gesture IDs to text and play the sentences.
 
-  > Some WekiMini functions are still not fully automated. You will have to find the sweet spot of the threshold slider manually using the WekiMini GUY.
+  > Some WekiMini functions are still not fully automated. For example, you will have to find the sweet spot of the threshold slider manually using the WekiMini GUI.
 
 1. Enjoy
