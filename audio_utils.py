@@ -7,12 +7,7 @@ KEY = os.environ['VOICE_RSS_KEY']
 
 def play(filepath):
     """Play an audio file."""
-    call(['mpg123', filepath])
-
-
-def call(args):
-    """Call another process, don't show it's output."""
-    p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(['mpg123', filepath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return p.communicate()
 
 
